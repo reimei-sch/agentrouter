@@ -294,9 +294,9 @@ footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 4
 <ol class="steps">
   <li>Get a free AgentRouter API key at <a href="https://agentrouter.org" target="_blank">agentrouter.org</a> (sign up with GitHub, get $150 free credits).</li>
   <li>In Janitor AI, open any chat → click the ⚙️ settings → <b>API Settings</b>.</li>
-  <li>Choose <b>Proxy</b> as the AI model, then <b>OpenAI</b> as the format.</li>
+  <li>Choose <b>Proxy</b> as the AI model.</li>
   <li>Paste the <b>Proxy URL</b> and your <b>AgentRouter key</b> below, then pick a model.</li>
-  <li>Hit <b>Save</b>. Done — start chatting.</li>
+  <li>Hit <b>Save</b>, then <b>refresh the page</b>. Done — start chatting.</li>
 </ol>
 </div>
 
