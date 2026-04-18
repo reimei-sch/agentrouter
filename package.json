@@ -1,3 +1,10 @@
 {
-  "type": "module"
+  "name": "agentrouter-bridge",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }

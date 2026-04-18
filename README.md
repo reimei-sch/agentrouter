@@ -2,7 +2,7 @@
 
 Public OpenAI + Anthropic compatible bridge for [AgentRouter](https://agentrouter.org/). Injects Claude Code client headers so AgentRouter accepts requests from any HTTP client.
 
-**Bring your own API key** — this is just a stateless header-injection bridge. No server-side keys, no auth gate. Any AgentRouter user can use this deployment.
+**Bring your own API key** — stateless header-injection bridge. No server-side keys, no auth gate.
 
 ## Endpoints
 
@@ -12,6 +12,27 @@ Public OpenAI + Anthropic compatible bridge for [AgentRouter](https://agentroute
 | `/v1/messages` | Anthropic | Messages API |
 | `/v1/models` | OpenAI | Model list |
 
+## Deploy to Render
+
+1. Push this repo to GitHub
+2. Go to [render.com](https://render.com) → **New +** → **Web Service**
+3. Connect your GitHub and pick this repo
+4. Configure:
+   - **Environment**: Node
+   - **Build Command**: *(leave blank)*
+   - **Start Command**: `npm start`
+   - **Instance Type**: Free
+5. Click **Create Web Service**
+
+Render assigns a URL like `https://your-service.onrender.com`. No env vars needed.
+
+## Local Development
+
+```bash
+npm start
+# listens on PORT (default 3000)
+```
+
 ## Usage
 
 Pass your AgentRouter API key in `Authorization: Bearer <key>` (or `x-api-key` for Anthropic clients).
@@ -19,14 +40,14 @@ Pass your AgentRouter API key in `Authorization: Bearer <key>` (or `x-api-key` f
 ### OpenAI-compatible clients
 
 ```
-Base URL: https://your-domain.vercel.app/v1
+Base URL: https://your-service.onrender.com/v1
 API Key: YOUR_AGENTROUTER_KEY
 ```
 
 ### Claude Code
 
 ```bash
-export ANTHROPIC_BASE_URL=https://your-domain.vercel.app/
+export ANTHROPIC_BASE_URL=https://your-service.onrender.com/
 export ANTHROPIC_AUTH_TOKEN=YOUR_AGENTROUTER_KEY
 export ANTHROPIC_MODEL="claude-opus-4-6"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5-20251001"
@@ -41,30 +62,19 @@ claude
 ### Test
 
 ```bash
-# OpenAI format
-curl https://your-domain.vercel.app/v1/chat/completions \
+curl https://your-service.onrender.com/v1/chat/completions \
   -H "Authorization: Bearer YOUR_AGENTROUTER_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"claude-opus-4-6","messages":[{"role":"user","content":"Hello!"}],"max_tokens":50}'
 
-# Anthropic format
-curl https://your-domain.vercel.app/v1/messages \
+curl https://your-service.onrender.com/v1/messages \
   -H "Authorization: Bearer YOUR_AGENTROUTER_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"claude-opus-4-6","messages":[{"role":"user","content":"Hello!"}],"max_tokens":50}'
 
-# Models
-curl https://your-domain.vercel.app/v1/models \
+curl https://your-service.onrender.com/v1/models \
   -H "Authorization: Bearer YOUR_AGENTROUTER_KEY"
 ```
-
-## Deploy
-
-```bash
-vercel deploy
-```
-
-No environment variables needed.
 
 ## How It Works
 
@@ -90,25 +100,20 @@ The forged headers:
 - `x-stainless-runtime-version: v24.3.0`
 - `x-stainless-package-version: 0.81.0`
 
-## Architecture
+## Note on Hosting
 
-```
-Client (with AgentRouter key)
-    ↓
-Vercel Bridge (strips headers, injects Claude Code fingerprint)
-    ↓
-AgentRouter (accepts as Claude Code client)
-```
+Vercel's AWS IPs are blocked by AgentRouter's Aliyun WAF (captcha challenge). Render works because its IPs aren't on that blocklist.
 
 ## Files
 
 ```
+server.js           # Node HTTP server (Render entry point)
 api/
-├── utils.js       # Shared headers, CORS, streaming
-├── chat.js        # /v1/chat/completions
-├── messages.js    # /v1/messages
-└── models.js      # /v1/models
-vercel.json        # Route configuration
+├── utils.js        # Shared headers, CORS, streaming
+├── chat.js         # Legacy Vercel handler (unused on Render)
+├── messages.js     # Legacy Vercel handler (unused on Render)
+└── models.js       # Legacy Vercel handler (unused on Render)
+package.json
 ```
 
 ## License
