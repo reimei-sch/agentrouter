@@ -72,6 +72,44 @@ async function forwardToAgentRouter(targetPath, request, method = 'POST', overri
   });
 }
 
+const OG_IMAGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#0f0f14"/>
+<stop offset="1" stop-color="#1a1a24"/>
+</linearGradient>
+<linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#f472b6"/>
+<stop offset="1" stop-color="#c084fc"/>
+</linearGradient>
+<radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+<stop offset="0" stop-color="#f472b6" stop-opacity="0.25"/>
+<stop offset="1" stop-color="#f472b6" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1200" height="630" fill="url(#bg)"/>
+<circle cx="900" cy="180" r="300" fill="url(#glow)"/>
+<circle cx="300" cy="500" r="260" fill="url(#glow)" opacity="0.6"/>
+<g transform="translate(80, 240)">
+<text font-family="ui-sans-serif, system-ui, sans-serif" font-size="88" font-weight="800" fill="url(#accent)">AgentRouter Bridge</text>
+<text y="80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="34" fill="#e4e4e7">Free OpenAI-compatible proxy for Janitor AI</text>
+<text y="128" font-family="ui-monospace, monospace" font-size="22" fill="#a1a1aa">Claude Opus 4.6 · GPT · DeepSeek · GLM · and more</text>
+</g>
+<rect x="80" y="520" width="12" height="44" rx="6" fill="url(#accent)"/>
+<text x="108" y="552" font-family="ui-monospace, monospace" font-size="20" fill="#a1a1aa">bring your own AgentRouter key · no logs · no limits</text>
+</svg>`;
+
+const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#f472b6"/>
+<stop offset="1" stop-color="#c084fc"/>
+</linearGradient>
+</defs>
+<rect width="64" height="64" rx="14" fill="#0f0f14"/>
+<path d="M16 44 L32 16 L48 44 M22 36 L42 36" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>`;
+
 function landingPage(host) {
   const baseUrl = `https://${host}`;
   return `<!doctype html>
@@ -79,7 +117,26 @@ function landingPage(host) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AgentRouter Bridge — Janitor AI Setup</title>
+<title>AgentRouter Bridge — Free Claude, GPT, DeepSeek for Janitor AI</title>
+<meta name="description" content="Free OpenAI-compatible proxy for Janitor AI. Access Claude Opus 4.6, GPT, DeepSeek, and GLM models through AgentRouter with one-click setup.">
+<meta name="theme-color" content="#f472b6">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AgentRouter Bridge">
+<meta property="og:title" content="AgentRouter Bridge — Free AI Proxy for Janitor AI">
+<meta property="og:description" content="Free OpenAI-compatible proxy. Access Claude Opus 4.6, GPT, DeepSeek, GLM, and more through AgentRouter. One-click setup for Janitor AI.">
+<meta property="og:url" content="${baseUrl}/">
+<meta property="og:image" content="${baseUrl}/og.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AgentRouter Bridge — Free AI proxy for Janitor AI">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AgentRouter Bridge — Free AI Proxy for Janitor AI">
+<meta name="twitter:description" content="Free OpenAI-compatible proxy for Janitor AI. Claude Opus 4.6, GPT, DeepSeek & more.">
+<meta name="twitter:image" content="${baseUrl}/og.svg">
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
 :root {
   --bg: #0f0f14;
@@ -235,7 +292,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 4
 <h2>Quick Setup for Janitor AI</h2>
 <div class="card">
 <ol class="steps">
-  <li>Get a free AgentRouter API key at <a href="https://agentrouter.org" target="_blank">agentrouter.org</a> (sign up with GitHub, get $200 free credits).</li>
+  <li>Get a free AgentRouter API key at <a href="https://agentrouter.org" target="_blank">agentrouter.org</a> (sign up with GitHub, get $150 free credits).</li>
   <li>In Janitor AI, open any chat → click the ⚙️ settings → <b>API Settings</b>.</li>
   <li>Choose <b>Proxy</b> as the AI model, then <b>OpenAI</b> as the format.</li>
   <li>Paste the <b>Proxy URL</b> and your <b>AgentRouter key</b> below, then pick a model.</li>
@@ -365,6 +422,24 @@ export default {
       }
       if (path === '/api/models' && request.method === 'GET') {
         return await forwardToAgentRouter('/v1/models', request, 'GET', PUBLIC_MODELS_KEY);
+      }
+      if (path === '/og.svg' && request.method === 'GET') {
+        return new Response(OG_IMAGE_SVG, {
+          headers: {
+            'content-type': 'image/svg+xml',
+            'cache-control': 'public, max-age=86400',
+            ...CORS_HEADERS,
+          },
+        });
+      }
+      if (path === '/favicon.svg' && request.method === 'GET') {
+        return new Response(FAVICON_SVG, {
+          headers: {
+            'content-type': 'image/svg+xml',
+            'cache-control': 'public, max-age=86400',
+            ...CORS_HEADERS,
+          },
+        });
       }
       if (path === '/health') {
         return new Response(
